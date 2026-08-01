@@ -143,4 +143,16 @@ public class OutPassController {
         response.put("reply", reply);
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * POST /api/outpass/ai/magic-parse
+     * Uses Gemini AI to parse a natural language string into exact dates and reason.
+     */
+    @PostMapping("/ai/magic-parse")
+    public ResponseEntity<String> parseMagicPrompt(@RequestBody Map<String, String> body) {
+        String prompt = body.getOrDefault("prompt", "");
+        // We can just call GeminiService directly or route through OutPassService.
+        // Since the user added it to GeminiService, we'll route it via OutPassService for consistency.
+        return ResponseEntity.ok(outPassService.parseMagicPrompt(prompt));
+    }
 }

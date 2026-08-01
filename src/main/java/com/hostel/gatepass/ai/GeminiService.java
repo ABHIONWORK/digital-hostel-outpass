@@ -90,6 +90,29 @@ public class GeminiService {
     }
 
     /**
+     * Parses a natural language sentence into exact dates, times, and a formal reason.
+     * 
+     * @param magicPrompt The natural language request (e.g., "I need to go home tomorrow evening...")
+     * @return JSON string containing outTime, expectedInTime (in ISO-8601 format), and formalReason
+     */
+    public String parseMagicPrompt(String magicPrompt) {
+        LocalDateTime now = LocalDateTime.now();
+        String prompt = "You are an AI assistant parsing natural language hostel pass requests. " +
+                "The current date and time is: " + now.toString() + "\n\n" +
+                "Parse the student's request and return ONLY a valid JSON object (no markdown) with exactly three fields:\n" +
+                "  \"outTime\": ISO-8601 formatted datetime (e.g., 2026-08-05T18:00:00)\n" +
+                "  \"expectedInTime\": ISO-8601 formatted datetime (e.g., 2026-08-08T08:00:00)\n" +
+                "  \"formalReason\": A concise, professional one-sentence reason for the leave.\n\n" +
+                "Make reasonable assumptions for times if not specified (e.g., 'evening' = 18:00, 'morning' = 08:00). " +
+                "If no duration is given, assume returning the same day at 21:00 or next morning depending on context.\n\n" +
+                "Student request: " + magicPrompt + "\n\n" +
+                "Respond with only the JSON object.";
+
+        String rawResponse = callGemini(prompt);
+        return rawResponse.replace("```json", "").replace("```", "").trim();
+    }
+
+    /**
      * Chats with the Campus Concierge chatbot, answering student questions about rules.
      *
      * @param userMessage The student's question
