@@ -50,8 +50,9 @@ class OutPassServiceTest {
     void setUp() {
         now = LocalDateTime.now();
         // Lenient: only activates when requestPass() is tested; won't fail unrelated tests.
-        lenient().when(geminiService.analysePassRequest(any(), any(), any(), any()))
-                .thenReturn(new AiPassAnalysis("LOW", "AI stub: low risk pass for unit test."));
+        lenient().when(geminiService.analysePassRequest(any(), any(), any(), any(), any(Integer.class), any(Integer.class)))
+                .thenReturn(new AiPassAnalysis("LOW", "AI stub: low risk pass for unit test.", false));
+        lenient().when(outPassRepository.findByStudentId(any())).thenReturn(java.util.Collections.emptyList());
     }
 
     @Test

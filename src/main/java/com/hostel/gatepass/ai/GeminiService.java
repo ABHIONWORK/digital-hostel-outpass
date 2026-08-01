@@ -33,29 +33,37 @@ public class GeminiService {
     }
 
     /**
-     * Analyses a pass request and returns a risk level + warden advisory note.
+     * Analyses a pass request and returns a risk level + warden advisory note,
+     * along with an autonomous decision on whether to auto-approve.
      *
      * @param studentId    Student identifier
      * @param reason       Student-provided reason for leave
      * @param outTime      Departure time
      * @param expectedInTime Expected return time
-     * @return AiPassAnalysis containing riskLevel (LOW/MEDIUM/HIGH) and summary
+     * @param totalPasses  Historical number of passes
+     * @param lateReturns  Historical number of late returns
+     * @return AiPassAnalysis containing riskLevel, summary, and autoApprove decision
      */
     public AiPassAnalysis analysePassRequest(String studentId, String reason,
-                                             LocalDateTime outTime, LocalDateTime expectedInTime) {
+                                             LocalDateTime outTime, LocalDateTime expectedInTime,
+                                             int totalPasses, int lateReturns) {
         long durationHours = ChronoUnit.HOURS.between(outTime, expectedInTime);
         int departureHour = outTime.getHour();
 
-        String prompt = "You are an AI assistant for a campus hostel warden management system. " +
+        String prompt = "You are an AI autonomous policy engine for a campus hostel. " +
                 "Analyse the following student leave request and return ONLY a valid JSON object " +
-                "(no markdown, no explanation) with exactly two fields:\n" +
+                "(no markdown, no explanation) with exactly three fields:\n" +
                 "  \"riskLevel\": one of \"LOW\", \"MEDIUM\", or \"HIGH\"\n" +
-                "  \"summary\": a single neutral sentence (max 20 words) advising the warden\n\n" +
+                "  \"summary\": a single neutral sentence (max 20 words) advising the warden\n" +
+                "  \"autoApprove\": boolean (true/false) whether to skip warden review\n\n" +
+                "Auto-Approve Criteria: MUST be true ONLY IF riskLevel is LOW AND lateReturns is 0.\n" +
                 "Risk criteria:\n" +
-                "  LOW: clear legitimate reason, duration under 12 hours, normal daytime departure\n" +
+                "  LOW: clear legitimate routine reason, duration under 12 hours, normal daytime departure\n" +
                 "  MEDIUM: vague reason OR duration 12-36 hours OR late-night departure (after 9 PM)\n" +
-                "  HIGH: very vague/suspicious reason OR duration over 36 hours OR departure after midnight\n\n" +
+                "  HIGH: very vague/suspicious reason OR duration over 36 hours OR departure after midnight OR late returns > 0\n\n" +
                 "Student ID: " + studentId + "\n" +
+                "Historical total passes: " + totalPasses + "\n" +
+                "Historical late returns: " + lateReturns + "\n" +
                 "Reason: " + reason + "\n" +
                 "Duration: " + durationHours + " hours\n" +
                 "Departure hour: " + departureHour + ":00\n\n" +
@@ -79,6 +87,22 @@ public class GeminiService {
 
         String response = callGemini(prompt);
         return response.trim().replaceAll("^[\"']|[\"']$", "");
+    }
+
+    /**
+     * Chats with the Campus Concierge chatbot, answering student questions about rules.
+     *
+     * @param userMessage The student's question
+     * @return The AI's response
+     */
+    public String chatWithConcierge(String userMessage) {
+        String prompt = "You are the friendly Campus Concierge chatbot for a hostel gatepass system. " +
+                "Answer the student's question concisely. Be helpful and polite. " +
+                "Hostel Rules: Curfew is 10 PM. Passes must be approved by the warden unless it's a low-risk routine " +
+                "trip for a student with 0 late returns (which you auto-approve). Students must mark their exit at the gate.\n\n" +
+                "Student: " + userMessage;
+
+        return callGemini(prompt);
     }
 
     /**
@@ -166,7 +190,7 @@ public class GeminiService {
      */
     private AiPassAnalysis parseAnalysis(String rawText) {
         if (rawText == null || rawText.isBlank()) {
-            return new AiPassAnalysis("LOW", "AI analysis unavailable; please review manually.");
+            return new AiPassAnalysis("LOW", "AI analysis unavailable; please review manually.", false);
         }
 
         // Strip optional markdown code fences
@@ -174,6 +198,7 @@ public class GeminiService {
 
         String riskLevel = extractJsonString(cleaned, "riskLevel");
         String summary = extractJsonString(cleaned, "summary");
+        boolean autoApprove = extractJsonBoolean(cleaned, "autoApprove");
 
         // Validate riskLevel against allowed values
         if (!riskLevel.equals("LOW") && !riskLevel.equals("MEDIUM") && !riskLevel.equals("HIGH")) {
@@ -184,7 +209,7 @@ public class GeminiService {
             summary = "AI analysis incomplete; please review manually.";
         }
 
-        return new AiPassAnalysis(riskLevel, summary);
+        return new AiPassAnalysis(riskLevel, summary, autoApprove);
     }
 
     /**
@@ -247,5 +272,31 @@ public class GeminiService {
         }
         sb.append("\"");
         return sb.toString();
+    }
+
+    /**
+     * Extracts a boolean value from a simple flat JSON object by key name.
+     */
+    private boolean extractJsonBoolean(String json, String key) {
+        String searchKey = "\"" + key + "\"";
+        int keyIndex = json.indexOf(searchKey);
+        if (keyIndex < 0) {
+            return false;
+        }
+
+        int colonIndex = json.indexOf(":", keyIndex + searchKey.length());
+        if (colonIndex < 0) {
+            return false;
+        }
+
+        // Look for 'true' in the text following the colon
+        int nextComma = json.indexOf(",", colonIndex);
+        int nextBrace = json.indexOf("}", colonIndex);
+        int end = json.length();
+        if (nextComma > 0) end = Math.min(end, nextComma);
+        if (nextBrace > 0) end = Math.min(end, nextBrace);
+        
+        String valueSubstring = json.substring(colonIndex + 1, end).trim();
+        return valueSubstring.equals("true");
     }
 }

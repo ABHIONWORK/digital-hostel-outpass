@@ -53,12 +53,39 @@ public class OutPassService {
 
         OutPass outPass = new OutPass(studentId, reason, out, expectedIn, OutPassStatus.PENDING);
 
-        // AI Risk Analysis: call Gemini to score the request before saving.
+        // Fetch historical context for AI Policy Engine
+        List<OutPass> history = outPassRepository.findByStudentId(studentId);
+        int totalPasses = history.size();
+        int lateReturns = 0;
+        
+        for (int i = 0; i < history.size(); i++) {
+            OutPass pastPass = history.get(i);
+            if (OutPassStatus.RETURNED.equals(pastPass.getStatus()) 
+                    && pastPass.getActualInTime() != null 
+                    && pastPass.getExpectedInTime() != null) {
+                if (pastPass.getActualInTime().isAfter(pastPass.getExpectedInTime())) {
+                    lateReturns++;
+                }
+            } else if (OutPassStatus.EXITED.equals(pastPass.getStatus()) 
+                    && pastPass.getExpectedInTime() != null) {
+                if (LocalDateTime.now().isAfter(pastPass.getExpectedInTime())) {
+                    lateReturns++; // Currently outside and late
+                }
+            }
+        }
+
+        // AI Risk Analysis: call Gemini to score the request and potentially auto-approve.
         // Wrapped in try-catch so a Gemini failure never blocks pass creation.
         try {
-            AiPassAnalysis analysis = geminiService.analysePassRequest(studentId, reason, out, expectedIn);
+            AiPassAnalysis analysis = geminiService.analysePassRequest(studentId, reason, out, expectedIn, totalPasses, lateReturns);
             outPass.setAiRiskLevel(analysis.getRiskLevel());
-            outPass.setAiSummary(analysis.getSummary());
+            
+            if (analysis.isAutoApprove()) {
+                outPass.setStatus(OutPassStatus.APPROVED);
+                outPass.setAiSummary("⚡ Auto-Approved by AI. " + analysis.getSummary());
+            } else {
+                outPass.setAiSummary(analysis.getSummary());
+            }
         } catch (Exception ex) {
             System.err.println("[OutPassService] Gemini analysis failed, saving pass without AI data: " + ex.getMessage());
         }
@@ -204,5 +231,18 @@ public class OutPassService {
             throw new IllegalArgumentException("Reason cannot be empty for suggestion.");
         }
         return geminiService.suggestFormalReason(roughReason);
+    }
+
+    /**
+     * Delegates a chat message to the Gemini AI Campus Concierge.
+     *
+     * @param message The student's message
+     * @return The AI's reply
+     */
+    public String chatWithConcierge(String message) {
+        if (message == null || message.trim().isEmpty()) {
+            return "Please type a message.";
+        }
+        return geminiService.chatWithConcierge(message);
     }
 }

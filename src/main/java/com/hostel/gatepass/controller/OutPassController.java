@@ -130,4 +130,17 @@ public class OutPassController {
         response.put("suggestion", formal);
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * POST /api/outpass/ai/chat
+     * Uses Gemini AI to chat with the student about hostel rules.
+     */
+    @PostMapping("/ai/chat")
+    public ResponseEntity<Map<String, String>> chatWithConcierge(@RequestBody Map<String, String> body) {
+        String message = body.getOrDefault("message", "");
+        String reply = outPassService.chatWithConcierge(message);
+        Map<String, String> response = new HashMap<>();
+        response.put("reply", reply);
+        return ResponseEntity.ok(response);
+    }
 }
