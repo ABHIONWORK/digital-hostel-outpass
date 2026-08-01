@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://digital-hostel-outpass.onrender.com/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/src/main/resources/static/$1"
+    }
+  ]
+}

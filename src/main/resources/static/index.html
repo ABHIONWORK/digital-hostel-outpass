@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Outpass Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border-light: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --success: #059669;
+            --success-light: #ecfdf5;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --purple: #7c3aed;
+            --purple-light: #f5f3ff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+            --radius-md: 10px;
+            --radius-lg: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            padding: 2.5rem 1rem 4rem;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Top Navigation Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background-color: var(--text-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-text h1 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .brand-text p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid var(--border-light);
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .btn:hover {
+            background-color: #f1f5f9;
+            border-color: var(--border-hover);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border-color: transparent;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+            border-color: transparent;
+        }
+
+        .btn-success:hover {
+            background-color: #047857;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: white;
+            color: var(--danger);
+            border-color: #fca5a5;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger-light);
+            border-color: #f87171;
+        }
+
+        /* Filter Tabs */
+        .filter-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.75rem;
+            background-color: #f1f5f9;
+            padding: 0.35rem;
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .tab-btn {
+            border: none;
+            background: transparent;
+            padding: 0.55rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.15s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .count-pill {
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background-color: #e2e8f0;
+            color: var(--text-secondary);
+        }
+
+        .tab-btn.active .count-pill {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Main Workspace Grid */
+        .workspace {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-header {
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.85rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card-header p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.825rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.65rem 0.85rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            background-color: #fff;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        /* List Items */
+        .passes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .pass-item {
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1.15rem 1.25rem;
+            background-color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            transition: border-color 0.15s ease;
+        }
+
+        .pass-item:hover {
+            border-color: var(--border-hover);
+        }
+
+        .pass-item.is-defaulter {
+            border-left: 4px solid var(--danger);
+            background-color: #fffafb;
+        }
+
+        .pass-main {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .pass-title-row {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-wrap: wrap;
+        }
+
+        .student-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .status-badge {
+            font-size: 0.725rem;
+            font-weight: 600;
+            padding: 0.2rem 0.55rem;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .status-PENDING { background-color: var(--warning-light); color: var(--warning); border: 1px solid #fde68a; }
+        .status-APPROVED { background-color: var(--primary-light); color: var(--primary); border: 1px solid #bfdbfe; }
+        .status-REJECTED { background-color: var(--danger-light); color: var(--danger); border: 1px solid #fecaca; }
+        .status-EXITED { background-color: var(--purple-light); color: var(--purple); border: 1px solid #ddd6fe; }
+        .status-RETURNED { background-color: var(--success-light); color: var(--success); border: 1px solid #a7f3d0; }
+
+        .defaulter-badge {
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .pass-reason {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .pass-timestamps {
+            font-size: 0.775rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+            margin-top: 0.25rem;
+        }
+
+        .pass-timestamps span strong {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .pass-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        /* AI Risk Badges */
+        .ai-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.55rem;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .ai-LOW  { background-color: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+        .ai-MEDIUM { background-color: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+        .ai-HIGH { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+        .ai-summary {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 0.2rem;
+        }
+
+        .suggest-btn {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.65rem;
+            border-radius: 6px;
+            border: 1px solid #bfdbfe;
+            background-color: #eff6ff;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .suggest-btn:hover {
+            background-color: #dbeafe;
+        }
+
+        .suggest-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        /* STORYBOOK / HOW IT WORKS SECTION */
+        .story-section {
+            margin-top: 4.5rem;
+            border-top: 1px solid var(--border-light);
+            padding-top: 3.5rem;
+        }
+
+        .story-header {
+            max-width: 680px;
+            margin-bottom: 2.5rem;
+        }
+
+        .story-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .story-header p {
+            color: var(--text-secondary);
+            margin-top: 0.4rem;
+            font-size: 0.95rem;
+        }
+
+        .story-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .story-card {
+            background-color: #fff;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chapter-num {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .story-card h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .story-card p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .story-quote {
+            background-color: #f8fafc;
+            border-left: 3px solid var(--border-hover);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.825rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-top: auto;
+        }
+
+        /* Toast feedback */
+        #toast-wrap {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            padding: 0.85rem 1.25rem;
+            border-radius: 8px;
+            background-color: #0f172a;
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Top Navbar -->
+        <header>
+            <div class="header-brand">
+                <div class="brand-badge">P</div>
+                <div class="brand-text">
+                    <h1>Campus Outpass Portal</h1>
+                    <p>Digital hostel leave management for students, wardens, and security guards.</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn" onclick="seedSampleData()">
+                    <span>Load Sample Data</span>
+                </button>
+                <button class="btn" onclick="loadPasses()">
+                    <span>Refresh</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Category Tabs -->
+        <div class="filter-nav">
+            <button class="tab-btn active" onclick="switchView('all')" id="tab-all">
+                <span>All Passes</span>
+                <span class="count-pill" id="count-all">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchView('PENDING')" id="tab-PENDING">
+                <span>Warden Approval Queue</span>
+                <span class="count-pill" id="count-PENDING">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchView('APPROVED')" id="tab-APPROVED">
+                <span>Gate Check-out</span>
+                <span class="count-pill" id="count-APPROVED">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchView('EXITED')" id="tab-EXITED">
+                <span>Currently Off-Campus</span>
+                <span class="count-pill" id="count-EXITED">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchView('defaulters')" id="tab-defaulters">
+                <span>Late Return Audit</span>
+                <span class="count-pill" style="background-color: #fee2e2; color: #dc2626;" id="count-defaulters">0</span>
+            </button>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="workspace">
+            <!-- Left: Request Leave Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>New Leave Request</h2>
+                    <p>Students can submit an outpass application for warden review.</p>
+                </div>
+                <form id="requestForm" onsubmit="handleNewRequest(event)">
+                    <div class="form-group">
+                        <label class="form-label">Student ID / Roll No</label>
+                        <input type="text" class="form-control" id="studentId" placeholder="e.g. CS-2026-104" required>
+                    </div>
+                    <div class="form-group">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                            <label class="form-label" style="margin-bottom:0;">Purpose of Leave</label>
+                            <button type="button" class="suggest-btn" id="suggestBtn" onclick="suggestReason()">✦ Suggest with AI</button>
+                        </div>
+                        <input type="text" class="form-control" id="reason" placeholder="e.g. hackathon downtown / family visit" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Departure Time</label>
+                        <input type="datetime-local" class="form-control" id="outTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Expected Return Time</label>
+                        <input type="datetime-local" class="form-control" id="expectedInTime" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 0.5rem;">
+                        Submit Request
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right: Passes View / Audit Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 id="view-title">Active Passes</h2>
+                    <p id="view-subtitle">Showing all hostel outpass applications across campus.</p>
+                </div>
+                <div id="passes-container" class="passes-list">
+                    <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                        Loading outpasses...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HOW IT WORKS: STORYBOOK SECTION -->
+        <section class="story-section">
+            <div class="story-header">
+                <h2>How It Works: A Student's Story</h2>
+                <p>Follow Rohan's journey through the four stages of the digital gatepass system, designed to replace paper slips with transparent accountability.</p>
+            </div>
+
+            <div class="story-grid">
+                <!-- Chapter 1 -->
+                <div class="story-card">
+                    <div class="chapter-num">Chapter 1 • Application & AI Polish</div>
+                    <h3>Rohan Plans for a Weekend Hackathon</h3>
+                    <p>On Friday afternoon, Rohan needs to leave campus. He types a rough reason, but isn't sure how to sound professional. He clicks <strong>✦ Suggest with AI</strong>, and Google Gemini instantly polishes his words into a formal request before he submits.</p>
+                    <div class="story-quote">
+                        "No paper forms to lose. My request is logged immediately with status <strong>PENDING</strong>."
+                    </div>
+                </div>
+
+                <!-- Chapter 2 -->
+                <div class="story-card">
+                    <div class="chapter-num">Chapter 2 • AI Risk Assessment</div>
+                    <h3>Gemini Analyzes the Request</h3>
+                    <p>The moment the request is submitted, a non-blocking asynchronous task calls the Gemini API in the background. The AI reads the destination, duration, and purpose, and intelligently assigns a safety Risk Level (LOW, MEDIUM, HIGH) along with a concise summary.</p>
+                    <div class="story-quote">
+                        "The backend fetches AI insights in real-time, keeping the app fast and responsive."
+                    </div>
+                </div>
+
+                <!-- Chapter 3 -->
+                <div class="story-card">
+                    <div class="chapter-num">Chapter 3 • Warden Review</div>
+                    <h3>Warden Sharma Reviews the Request</h3>
+                    <p>Warden Sharma opens his queue. Instead of just reading raw text, he is greeted by an <strong>AI Risk Badge</strong> and a smart summary for each student. This helps him instantly approve safe passes or scrutinize risky ones. He confidently clicks <strong>Approve</strong>.</p>
+                    <div class="story-quote">
+                        "The system verifies the state and upgrades the status to <strong>APPROVED</strong>."
+                    </div>
+                </div>
+
+                <!-- Chapter 4 -->
+                <div class="story-card">
+                    <div class="chapter-num">Chapter 4 • Gate Departure</div>
+                    <h3>Checking Out at the Main Gate</h3>
+                    <p>At 5:00 PM, Rohan arrives at the main security checkpoint. The guard checks the <strong>Gate Check-out</strong> view, sees Rohan's approved pass, and clicks <strong>Mark Exit</strong>. Rohan walks out without delay.</p>
+                    <div class="story-quote">
+                        "Safety check: If a pass wasn't approved, the system blocks departure with a 409 Conflict."
+                    </div>
+                </div>
+
+                <!-- Chapter 5 -->
+                <div class="story-card">
+                    <div class="chapter-num">Chapter 5 • Return & Accountability</div>
+                    <h3>Curfew & The Late Return Audit</h3>
+                    <p>When Rohan returns before curfew on Sunday, the guard clicks <strong>Mark Return</strong>. However, if any student stays off-campus past their expected curfew, the automated <strong>Late Return Audit</strong> highlights them immediately for safety followup.</p>
+                    <div class="story-quote">
+                        "Every late return is detected algorithmically in real-time without manual paperwork."
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="toast-wrap"></div>
+
+    <script>
+        let allPassesData = [];
+        let activeView = 'all';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Set sensible default date values
+            const now = new Date();
+            const departure = new Date(now.getTime() + 20 * 60000);
+            const returnDate = new Date(now.getTime() + 6 * 3600000);
+            document.getElementById('outTime').value = departure.toISOString().slice(0, 16);
+            document.getElementById('expectedInTime').value = returnDate.toISOString().slice(0, 16);
+            
+            loadPasses();
+        });
+
+        function notify(msg) {
+            const container = document.getElementById('toast-wrap');
+            const el = document.createElement('div');
+            el.className = 'toast';
+            el.innerText = msg;
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 3500);
+        }
+
+        async function suggestReason() {
+            const reasonInput = document.getElementById('reason');
+            const btn = document.getElementById('suggestBtn');
+            const rough = reasonInput.value.trim();
+
+            if (!rough) {
+                notify('Type a rough reason first, then click Suggest.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Thinking...';
+
+            try {
+                const res = await fetch('/api/outpass/ai/suggest-reason', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason: rough })
+                });
+                const data = await res.json();
+                if (data.suggestion) {
+                    reasonInput.value = data.suggestion;
+                    notify('✦ Reason polished by AI.');
+                }
+            } catch (err) {
+                notify('AI suggest unavailable. Please type manually.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '✦ Suggest with AI';
+            }
+        }
+
+        async function loadPasses() {
+            try {
+                const response = await fetch('/api/outpass');
+                allPassesData = await response.json();
+
+                const defaultersResp = await fetch('/api/outpass/defaulters');
+                const defaultersList = await defaultersResp.json();
+
+                updateCountBadges(defaultersList.length);
+                renderCurrentView(defaultersList);
+            } catch (err) {
+                console.error('Failed to load passes:', err);
+                notify('Could not connect to the backend service.');
+            }
+        }
+
+        function updateCountBadges(defaultersCount) {
+            document.getElementById('count-all').innerText = allPassesData.length;
+            document.getElementById('count-PENDING').innerText = allPassesData.filter(p => p.status === 'PENDING').length;
+            document.getElementById('count-APPROVED').innerText = allPassesData.filter(p => p.status === 'APPROVED').length;
+            document.getElementById('count-EXITED').innerText = allPassesData.filter(p => p.status === 'EXITED').length;
+            document.getElementById('count-defaulters').innerText = defaultersCount;
+        }
+
+        function switchView(viewName) {
+            activeView = viewName;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${viewName}`).classList.add('active');
+
+            const titleMap = {
+                'all': 'All Active Passes',
+                'PENDING': 'Warden Approval Queue',
+                'APPROVED': 'Gate Check-out (Approved)',
+                'EXITED': 'Currently Off-Campus',
+                'defaulters': 'Late Return Audit'
+            };
+            const subtitleMap = {
+                'all': 'Showing all hostel outpass applications across campus.',
+                'PENDING': 'Applications waiting for warden review and approval.',
+                'APPROVED': 'Students approved to leave campus at the security gate.',
+                'EXITED': 'Students currently outside campus boundaries.',
+                'defaulters': 'Students who have exceeded their authorized leave duration.'
+            };
+
+            document.getElementById('view-title').innerText = titleMap[viewName];
+            document.getElementById('view-subtitle').innerText = subtitleMap[viewName];
+
+            if (viewName === 'defaulters') {
+                fetch('/api/outpass/defaulters').then(r => r.json()).then(renderList);
+            } else {
+                renderCurrentView();
+            }
+        }
+
+        function renderCurrentView(defaultersList) {
+            if (activeView === 'defaulters') {
+                if (defaultersList) renderList(defaultersList);
+                else fetch('/api/outpass/defaulters').then(r => r.json()).then(renderList);
+                return;
+            }
+
+            let toDisplay = allPassesData;
+            if (activeView !== 'all') {
+                toDisplay = allPassesData.filter(p => p.status === activeView);
+            }
+            renderList(toDisplay);
+        }
+
+        function renderList(listData) {
+            const container = document.getElementById('passes-container');
+            if (!listData || listData.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 3rem 1rem; text-align: center; color: var(--text-muted);">
+                        No outpass records found in this category.
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = listData.map(pass => {
+                const isLate = activeView === 'defaulters' || 
+                    (pass.status === 'EXITED' && new Date(pass.expectedInTime) < new Date());
+
+                return `
+                    <div class="pass-item ${isLate ? 'is-defaulter' : ''}">
+                        <div class="pass-main">
+                            <div class="pass-title-row">
+                                <span class="student-id">${pass.studentId}</span>
+                                <span class="status-badge status-${pass.status}">${pass.status}</span>
+                                ${pass.aiRiskLevel ? `<span class="ai-badge ai-${pass.aiRiskLevel}">AI: ${pass.aiRiskLevel}</span>` : ''}
+                                ${isLate ? '<span class="defaulter-badge">LATE RETURN</span>' : ''}
+                            </div>
+                            <div class="pass-reason">${pass.reason}</div>
+                            ${pass.aiSummary ? `<div class="ai-summary">✦ ${pass.aiSummary}</div>` : ''}
+                            <div class="pass-timestamps">
+                                <span><strong>Departure:</strong> ${formatDate(pass.outTime)}</span>
+                                <span><strong>Expected:</strong> ${formatDate(pass.expectedInTime)}</span>
+                                ${pass.actualInTime ? `<span><strong>Returned:</strong> ${formatDate(pass.actualInTime)}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="pass-actions">
+                            ${buildActionButtons(pass)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function buildActionButtons(pass) {
+            if (pass.status === 'PENDING') {
+                return `
+                    <button class="btn btn-success" onclick="updateStatus(${pass.id}, 'APPROVED')">Approve</button>
+                    <button class="btn btn-danger" onclick="updateStatus(${pass.id}, 'REJECTED')">Reject</button>
+                `;
+            } else if (pass.status === 'APPROVED') {
+                return `
+                    <button class="btn btn-primary" onclick="markExit(${pass.id})">Mark Exit</button>
+                `;
+            } else if (pass.status === 'EXITED') {
+                return `
+                    <button class="btn btn-success" onclick="markReturn(${pass.id})">Mark Return</button>
+                `;
+            }
+            return `<span style="font-size: 0.8rem; color: var(--text-muted);">Completed</span>`;
+        }
+
+        function formatDate(isoStr) {
+            if (!isoStr) return '—';
+            const date = new Date(isoStr);
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ', ' +
+                   date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        }
+
+        async function handleNewRequest(e) {
+            e.preventDefault();
+            const studentId = document.getElementById('studentId').value;
+            const reason = document.getElementById('reason').value;
+            const outTime = document.getElementById('outTime').value;
+            const expectedInTime = document.getElementById('expectedInTime').value;
+
+            try {
+                const res = await fetch('/api/outpass/request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId, reason, outTime, expectedInTime })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.message || 'Failed to submit request');
+                }
+
+                notify('Leave request submitted successfully.');
+                document.getElementById('reason').value = '';
+                loadPasses();
+            } catch (err) {
+                notify(err.message);
+            }
+        }
+
+        async function updateStatus(id, newStatus) {
+            try {
+                const res = await fetch(`/api/outpass/${id}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.message || 'Failed to update status');
+                }
+
+                notify(`Pass #${id} status updated to ${newStatus}.`);
+                loadPasses();
+            } catch (err) {
+                notify(err.message);
+            }
+        }
+
+        async function markExit(id) {
+            try {
+                const res = await fetch(`/api/outpass/${id}/exit`, {
+                    method: 'POST'
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.message || 'Cannot mark exit');
+                }
+
+                notify(`Student #${id} marked as exited.`);
+                loadPasses();
+            } catch (err) {
+                notify(err.message);
+            }
+        }
+
+        async function markReturn(id) {
+            try {
+                const res = await fetch(`/api/outpass/${id}/return`, {
+                    method: 'POST'
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.message || 'Cannot mark return');
+                }
+
+                notify(`Student #${id} return recorded.`);
+                loadPasses();
+            } catch (err) {
+                notify(err.message);
+            }
+        }
+
+        async function seedSampleData() {
+            try {
+                const now = new Date();
+                const pastDeparture = new Date(now.getTime() - 5 * 3600000).toISOString().slice(0, 16);
+                const pastReturn = new Date(now.getTime() - 1 * 3600000).toISOString().slice(0, 16);
+                const futureReturn = new Date(now.getTime() + 4 * 3600000).toISOString().slice(0, 16);
+
+                // 1. Defaulter (Exited and past curfew)
+                const req1 = await fetch('/api/outpass/request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId: 'MECH-402', reason: 'City Workshop (Delayed)', outTime: pastDeparture, expectedInTime: pastReturn })
+                });
+                const pass1 = await req1.json();
+                await updateStatus(pass1.id, 'APPROVED');
+                await markExit(pass1.id);
+
+                // 2. Approved & Exited on time
+                const req2 = await fetch('/api/outpass/request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId: 'CS-108', reason: 'Hackathon Downtown', outTime: pastDeparture, expectedInTime: futureReturn })
+                });
+                const pass2 = await req2.json();
+                await updateStatus(pass2.id, 'APPROVED');
+                await markExit(pass2.id);
+
+                // 3. Pending warden review
+                await fetch('/api/outpass/request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId: 'ELEC-205', reason: 'Weekend Visit Home', outTime: futureReturn, expectedInTime: futureReturn })
+                });
+
+                notify('Sample records loaded.');
+                loadPasses();
+            } catch (err) {
+                notify('Could not load sample data.');
+            }
+        }
+    </script>
+</body>
+</html>
